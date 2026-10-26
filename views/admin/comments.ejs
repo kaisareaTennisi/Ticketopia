@@ -1,0 +1,50 @@
+<section class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row gap-6">
+    <%- include('../partials/adminSidebar', { active: 'comments' }) %>
+
+    <div class="flex-1">
+      <h1 class="text-2xl font-bold mb-6">Kelola Ulasan</h1>
+
+      <div class="bg-white border border-gray-100 rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50">
+            <tr class="text-left text-gray-500">
+              <th class="p-3">Pengguna</th>
+              <th class="p-3">Destinasi</th>
+              <th class="p-3">Ulasan</th>
+              <th class="p-3">Rating</th>
+              <th class="p-3">Tanggal</th>
+              <th class="p-3">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% comments.forEach(function(c) { %>
+              <tr class="border-t border-gray-50 align-top">
+                <td class="p-3 font-medium"><%= c.User ? c.User.username : '-' %></td>
+                <td class="p-3">
+                  <% if (c.Destination) { %>
+                    <a href="/destinations/<%= c.Destination.id %>" class="text-green-800 hover:underline"><%= c.Destination.name %></a>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td class="p-3 max-w-xs"><%= c.content %></td>
+                <td class="p-3"><%= c.rating %> ★</td>
+                <td class="p-3 text-gray-400"><%= new Date(c.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                <td class="p-3">
+                  <form action="/comments/<%= c.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Hapus ulasan ini?');">
+                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+            <% if (comments.length === 0) { %>
+              <tr><td colspan="6" class="p-6 text-center text-gray-400">Belum ada ulasan.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+        <%- include('../partials/pagination', { pagination, baseUrl: '/admin/comments' }) %>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+<% if (pagination && pagination.totalPages > 1) { %>
+  <% const from = (pagination.page - 1) * pagination.perPage + 1; %>
+  <% const to = Math.min(pagination.page * pagination.perPage, pagination.totalItems); %>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-gray-100 text-sm">
+    <p class="text-gray-500">
+      Menampilkan <%= from %>–<%= to %> dari <%= pagination.totalItems %> data
+    </p>
+    <div class="flex items-center gap-2">
+      <% if (pagination.hasPrev) { %>
+        <a
+          href="<%= baseUrl %>?page=<%= pagination.prevPage %>"
+          class="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700"
+        >
+          Sebelumnya
+        </a>
+      <% } else { %>
+        <span class="px-3 py-1.5 border border-gray-100 rounded-lg text-gray-300 cursor-not-allowed">
+          Sebelumnya
+        </span>
+      <% } %>
+
+      <span class="px-2 text-gray-500">
+        <%= pagination.page %> / <%= pagination.totalPages %>
+      </span>
+
+      <% if (pagination.hasNext) { %>
+        <a
+          href="<%= baseUrl %>?page=<%= pagination.nextPage %>"
+          class="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700"
+        >
+          Selanjutnya
+        </a>
+      <% } else { %>
+        <span class="px-3 py-1.5 border border-gray-100 rounded-lg text-gray-300 cursor-not-allowed">
+          Selanjutnya
+        </span>
+      <% } %>
+    </div>
+  </div>
+<% } %>

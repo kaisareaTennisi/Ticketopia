@@ -1,0 +1,73 @@
+<section class="max-w-2xl mx-auto px-4 py-10">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Profil Saya</h1>
+    <p class="text-sm text-gray-500 mt-1">Kelola informasi akun dan data pribadi Anda.</p>
+    <% if (profile.age != null || profile.gender) { %>
+      <p class="text-xs text-gray-400 mt-1">
+        <%= profile.getGenderLabel() %><% if (profile.age != null) { %> · <%= profile.age %> tahun<% } %>
+      </p>
+    <% } %>
+  </div>
+
+  <div class="bg-white border border-gray-100 rounded-xl shadow-sm p-6 md:p-8">
+  <form action="/user/profile?_method=PUT" method="POST" class="space-y-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="text-sm font-medium text-gray-700">Nama Pengguna</label>
+        <input type="text" value="<%= user.username %>" disabled
+          class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm bg-gray-50 text-gray-500" />
+        <p class="text-xs text-gray-400 mt-1">Nama tampilan di navigasi (tidak dapat diubah di sini).</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Email</label>
+        <input type="email" value="<%= user.email %>" disabled
+          class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm bg-gray-50 text-gray-500" />
+      </div>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium text-gray-700">Nama Lengkap</label>
+      <input type="text" name="fullName" required value="<%= profile.fullName %>"
+        class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm" />
+    </div>
+
+    <div>
+      <label class="text-sm font-medium text-gray-700">Alamat</label>
+      <textarea name="address" rows="3" placeholder="Alamat lengkap"
+        class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm"><%= profile.address || '' %></textarea>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="text-sm font-medium text-gray-700">Nomor Telepon</label>
+        <input type="text" name="phoneNumber" value="<%= profile.phoneNumber || '' %>" placeholder="08xxxxxxxxxx"
+          class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm" />
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Tanggal Lahir</label>
+        <input type="date" name="birthDate" value="<%= profile.birthDate || '' %>"
+          class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm" />
+      </div>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium text-gray-700">Jenis Kelamin</label>
+      <select name="gender" class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm">
+        <option value="">— Pilih —</option>
+        <% genders.forEach(function(g) { %>
+          <option value="<%= g %>" <%= profile.gender === g ? 'selected' : '' %>>
+            <%= g === 'male' ? 'Laki-laki' : g === 'female' ? 'Perempuan' : 'Lainnya' %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <button type="submit" class="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2 rounded-lg text-sm">
+        Simpan Perubahan
+      </button>
+      <a href="/user/my-orders" class="text-sm text-gray-500 hover:text-green-800">Kembali ke pesanan</a>
+    </div>
+  </form>
+  </div>
+</section>

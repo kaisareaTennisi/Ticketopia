@@ -1,0 +1,199 @@
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <p class="text-xs text-gray-400 mb-4">
+    <a href="/" class="hover:underline">Beranda</a> /
+    <a href="/destinations?province=<%= encodeURIComponent(destination.Province ? destination.Province.name : '') %>" class="hover:underline"><%= destination.Province ? destination.Province.name : '-' %></a> /
+    <span class="text-gray-600"><%= destination.name %></span>
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <h1 class="text-2xl font-bold"><%= destination.name %></h1>
+      <p class="text-sm text-gray-500 mt-1"><%= destination.Province ? destination.Province.name : '-' %></p>
+      <% if (avgRating) { %>
+        <p class="text-sm text-yellow-600 mt-1">★ <%= avgRating %> (<%= comments.length %> ulasan)</p>
+      <% } %>
+
+      <img src="<%= destination.image || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=1000' %>" class="w-full h-72 object-cover rounded-xl mt-4" alt="<%= destination.name %>" />
+
+      <div class="mt-8">
+        <h2 class="font-bold text-lg mb-2">Deskripsi</h2>
+        <p class="text-sm text-gray-600 whitespace-pre-line"><%= destination.description || '-' %></p>
+      </div>
+
+      <div class="mt-10" id="ulasan">
+        <h2 class="font-bold text-lg mb-4">Ulasan Pengunjung (<%= comments.length %>)</h2>
+
+        <% if (canComment) { %>
+          <form action="/destinations/<%= destination.id %>/comments" method="POST" class="bg-white border border-gray-100 rounded-lg p-4 mb-6">
+            <p class="text-sm font-medium mb-2">Tulis ulasan Anda</p>
+            <div class="flex items-center gap-2 mb-3">
+              <label class="text-xs text-gray-500">Rating:</label>
+              <select name="rating" class="border border-gray-200 rounded-lg px-2 py-1 text-sm">
+                <option value="5">5 - Sangat Bagus</option>
+                <option value="4">4 - Bagus</option>
+                <option value="3">3 - Cukup</option>
+                <option value="2">2 - Kurang</option>
+                <option value="1">1 - Buruk</option>
+              </select>
+            </div>
+            <textarea name="content" rows="3" required placeholder="Bagaimana pengalaman Anda di destinasi ini?" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"></textarea>
+            <button type="submit" class="mt-3 bg-green-800 hover:bg-green-900 text-white text-sm font-medium px-5 py-2 rounded-lg">
+              Kirim Ulasan
+            </button>
+          </form>
+        <% } else if (currentUser && !hasPurchased) { %>
+          <p class="text-sm text-gray-500 mb-6 bg-gray-50 border border-gray-100 rounded-lg p-4">
+            Anda hanya bisa memberi ulasan setelah membeli dan melunasi tiket destinasi ini.
+          </p>
+        <% } %>
+
+        <div class="space-y-4">
+          <% comments.forEach(function(c) { %>
+            <div class="border-b border-gray-100 pb-4" id="comment-<%= c.id %>">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-sm"><%= c.User ? c.User.username : 'Pengguna' %></p>
+                  <p class="text-xs text-yellow-600">
+                    <% for(let i=0;i<5;i++){ %><%= i < c.rating ? '★' : '☆' %><% } %>
+                  </p>
+                </div>
+                <p class="text-xs text-gray-400"><%= new Date(c.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %></p>
+              </div>
+
+              <p class="text-sm text-gray-600 mt-2"><%= c.content %></p>
+
+              <% if (currentUser && (currentUser.id === c.UserId || currentUser.role === 'admin')) { %>
+                <div class="flex gap-3 mt-2 text-xs">
+                  <% if (currentUser.id === c.UserId) { %>
+                    <button type="button" onclick="document.getElementById('edit-form-<%= c.id %>').classList.toggle('hidden')" class="text-blue-600 hover:underline">Edit</button>
+                  <% } %>
+                  <form action="/comments/<%= c.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Hapus ulasan ini?');">
+                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                  </form>
+                </div>
+
+                <% if (currentUser.id === c.UserId) { %>
+                  <form id="edit-form-<%= c.id %>" action="/comments/<%= c.id %>?_method=PUT" method="POST" class="hidden mt-3 bg-gray-50 rounded-lg p-3">
+                    <select name="rating" class="border border-gray-200 rounded-lg px-2 py-1 text-xs mb-2">
+                      <option value="5" <%= c.rating===5?'selected':'' %>>5 - Sangat Bagus</option>
+                      <option value="4" <%= c.rating===4?'selected':'' %>>4 - Bagus</option>
+                      <option value="3" <%= c.rating===3?'selected':'' %>>3 - Cukup</option>
+                      <option value="2" <%= c.rating===2?'selected':'' %>>2 - Kurang</option>
+                      <option value="1" <%= c.rating===1?'selected':'' %>>1 - Buruk</option>
+                    </select>
+                    <textarea name="content" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs"><%= c.content %></textarea>
+                    <button type="submit" class="mt-2 bg-green-800 text-white text-xs font-medium px-4 py-1.5 rounded-lg">Simpan</button>
+                  </form>
+                <% } %>
+              <% } %>
+            </div>
+          <% }) %>
+          <% if (comments.length === 0) { %>
+            <p class="text-sm text-gray-400">Belum ada ulasan untuk destinasi ini.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="bg-white border border-gray-100 rounded-xl p-5 sticky top-20">
+        <h2 class="font-bold text-lg mb-4">Beli Tiket</h2>
+
+        <% if (destination.Tickets && destination.Tickets.length > 0) { %>
+          <% const ticket = destination.Tickets[0]; %>
+          <% if (ticket.description) { %>
+            <p class="text-sm text-gray-500 mb-4"><%= ticket.description %></p>
+          <% } %>
+          <div
+            id="ticket-purchase-panel"
+            data-ticket-id="<%= ticket.id %>"
+            data-price="<%= ticket.price %>"
+            data-stock="<%= ticket.stock %>"
+          >
+            <div class="border-t border-gray-100 pt-3 flex items-center justify-between text-sm mb-4">
+              <span class="text-gray-500">Harga per tiket</span>
+              <span class="font-bold text-green-800"><%= ticket.formattedPrice %></span>
+            </div>
+            <p class="text-xs text-gray-400 mb-4">Stok tersedia: <%= ticket.stock %></p>
+
+            <% if (currentUser) { %>
+              <div class="space-y-4">
+                <div>
+                  <label class="text-xs text-gray-500">Jumlah Tiket</label>
+                  <input
+                    id="ticket-quantity"
+                    type="number"
+                    name="quantity"
+                    value="1"
+                    min="1"
+                    max="<%= ticket.stock %>"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 text-sm"
+                    <%= ticket.stock < 1 ? 'disabled' : '' %>
+                  />
+                </div>
+
+                <div class="flex items-center justify-between text-sm border border-gray-100 rounded-lg px-3 py-2 bg-gray-50">
+                  <span class="text-gray-500">Total</span>
+                  <span id="ticket-total" class="font-bold text-green-800"><%= ticket.formattedPrice %></span>
+                </div>
+
+                <% if (ticket.stock >= 1) { %>
+                  <form action="/tickets/<%= ticket.id %>/buy" method="POST">
+                    <input type="hidden" name="quantity" id="buy-quantity" value="1" />
+                    <button type="submit" class="w-full bg-green-800 hover:bg-green-900 text-white font-medium py-2.5 rounded-lg">
+                      Pesan Sekarang
+                    </button>
+                  </form>
+
+                  <% if (currentUser.role === 'user') { %>
+                    <button
+                      id="add-to-cart-btn"
+                      type="button"
+                      class="w-full border border-green-800 text-green-800 hover:bg-green-50 font-medium py-2.5 rounded-lg"
+                    >
+                      Tambah ke Keranjang
+                    </button>
+                  <% } %>
+                <% } else { %>
+                  <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2.5 rounded-lg cursor-not-allowed">
+                    Stok Habis
+                  </button>
+                <% } %>
+
+                <p id="purchase-message" class="text-xs text-gray-400"></p>
+              </div>
+            <% } else if (ticket.stock < 1) { %>
+              <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2.5 rounded-lg cursor-not-allowed">Stok Habis</button>
+            <% } else { %>
+              <a href="/login?next=<%= encodeURIComponent('/destinations/' + destination.id) %>" class="block w-full text-center bg-green-800 hover:bg-green-900 text-white font-medium py-2.5 rounded-lg">Login untuk Pesan</a>
+              <p class="text-xs text-gray-400 text-center mt-2">Belum punya akun? <a href="/register?next=<%= encodeURIComponent('/destinations/' + destination.id) %>" class="text-green-800 hover:underline">Daftar di sini</a></p>
+            <% } %>
+          </div>
+        <% } else { %>
+          <p class="text-sm text-gray-400">Tiket untuk destinasi ini belum tersedia.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/cart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const qtyInput = document.getElementById('ticket-quantity');
+    const buyQtyInput = document.getElementById('buy-quantity');
+
+    if (qtyInput && buyQtyInput) {
+      const syncBuyQty = () => {
+        buyQtyInput.value = qtyInput.value;
+      };
+      qtyInput.addEventListener('input', syncBuyQty);
+      qtyInput.addEventListener('change', syncBuyQty);
+      syncBuyQty();
+    }
+
+    if (window.TiketopiaCart) {
+      window.TiketopiaCart.initDetailPage();
+    }
+  });
+</script>
