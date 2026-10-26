@@ -1,0 +1,50 @@
+<section class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row gap-6">
+    <%- include('../partials/adminSidebar', { active: 'destinations' }) %>
+
+    <div class="flex-1">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold">Kelola Destinasi</h1>
+        <a href="/admin/destinations/new" class="bg-green-800 hover:bg-green-900 text-white text-sm font-medium px-4 py-2 rounded-lg">
+          + Tambah Destinasi
+        </a>
+      </div>
+
+      <div class="bg-white border border-gray-100 rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50">
+            <tr class="text-left text-gray-500">
+              <th class="p-3">Destinasi</th>
+              <th class="p-3">Provinsi</th>
+              <th class="p-3">Harga</th>
+              <th class="p-3">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% destinations.forEach(function(d) { %>
+              <tr class="border-t border-gray-50">
+                <td class="p-3 font-medium"><%= d.name %></td>
+                <td class="p-3"><%= d.Province ? d.Province.name : '-' %></td>
+                <td class="p-3">
+                  <%= d.formattedStartingPrice %>
+                </td>
+                <td class="p-3">
+                  <div class="flex gap-3">
+                    <a href="/admin/destinations/<%= d.id %>/edit" class="text-blue-600 hover:underline">Edit</a>
+                    <form action="/admin/destinations/<%= d.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Hapus destinasi <%= d.name %>?');">
+                      <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+            <% if (destinations.length === 0) { %>
+              <tr><td colspan="4" class="p-6 text-center text-gray-400">Belum ada destinasi.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+        <%- include('../partials/pagination', { pagination, baseUrl: '/admin/destinations' }) %>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+<section class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row gap-6">
+    <%- include('../partials/adminSidebar', { active: 'dashboard' }) %>
+
+    <div class="flex-1">
+      <h1 class="text-2xl font-bold mb-6">Dashboard Admin</h1>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white border border-gray-100 rounded-xl p-5">
+          <p class="text-xs text-gray-400">Total Destinasi</p>
+          <p class="text-2xl font-bold mt-1"><%= stats.totalDestinations %></p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-xl p-5">
+          <p class="text-xs text-gray-400">Transaksi Lunas</p>
+          <p class="text-2xl font-bold mt-1"><%= stats.totalTransactions %></p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-xl p-5">
+          <p class="text-xs text-gray-400">Total Pengguna</p>
+          <p class="text-2xl font-bold mt-1"><%= stats.totalUsers %></p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-xl p-5">
+          <p class="text-xs text-gray-400">Total Pendapatan</p>
+          <p class="text-2xl font-bold mt-1">Rp<%= Number(stats.revenue).toLocaleString('id-ID') %></p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-100 rounded-xl p-5">
+        <h2 class="font-semibold mb-4">Transaksi Terbaru</h2>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-400 border-b border-gray-100">
+              <th class="pb-2">Kode</th>
+              <th class="pb-2">Pengguna</th>
+              <th class="pb-2">Total</th>
+              <th class="pb-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentTransactions.forEach(function(t) { %>
+              <tr class="border-b border-gray-50">
+                <td class="py-2">TRX-<%= String(t.id).padStart(6,'0') %></td>
+                <td class="py-2"><%= t.User ? t.User.username : '-' %></td>
+                <td class="py-2">Rp<%= Number(t.totalPrice).toLocaleString('id-ID') %></td>
+                <td class="py-2"><span class="text-green-700 font-medium">LUNAS</span></td>
+              </tr>
+            <% }) %>
+            <% if (recentTransactions.length === 0) { %>
+              <tr><td colspan="4" class="py-4 text-center text-gray-400">Belum ada transaksi.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+        <%- include('../partials/pagination', { pagination, baseUrl: '/admin/dashboard' }) %>
+      </div>
+    </div>
+  </div>
+</section>
